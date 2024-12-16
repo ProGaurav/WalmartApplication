@@ -1,5 +1,6 @@
 package com.ecommerce.walmart.services.userService;
 
+import com.ecommerce.walmart.exceptions.InvalidUserException;
 import com.ecommerce.walmart.exceptions.ResourceNotFoundException;
 import com.ecommerce.walmart.services.dtos.AddressRequestDto;
 import com.ecommerce.walmart.services.dtos.UserRequestDto;
@@ -11,7 +12,7 @@ public interface UserService {
     //Get
     List<UserResponseDto> fetchAllUsers();
     //Post
-   UserResponseDto addUser(UserRequestDto user);
+   UserResponseDto addUser(UserRequestDto user) throws InvalidUserException;
     //Delete
     void deleteUser(int userId) throws ResourceNotFoundException;
     //Put
