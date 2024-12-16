@@ -1,8 +1,7 @@
 package com.ecommerce.walmart.controllers;
 
-import com.ecommerce.walmart.controllers.resourceView.UserRequestRv;
-import com.ecommerce.walmart.controllers.resourceView.UserResponseRv;
 import com.ecommerce.walmart.exceptions.InvalidUserException;
+import com.ecommerce.walmart.exceptions.ResourceNotFoundException;
 import com.ecommerce.walmart.services.dtos.UserRequestDto;
 import com.ecommerce.walmart.services.dtos.UserResponseDto;
 import com.ecommerce.walmart.services.userService.UserService;
@@ -11,10 +10,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -24,14 +22,34 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    //add user
     @PostMapping("/users")
-    public ResponseEntity<UserResponseRv> createUser(@Valid @RequestBody UserRequestRv userRequestRv) throws InvalidUserException {
-        UserResponseDto userResponseDto = userService.addUser(mapper.map(userRequestRv, UserRequestDto.class));
-        return new ResponseEntity<>(mapper.map(userResponseDto, UserResponseRv.class), HttpStatus.CREATED);
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) throws InvalidUserException {
+        UserResponseDto userResponseDto = userService.addUser(userRequestDto);
+        return new ResponseEntity<>(userResponseDto, HttpStatus.CREATED);
     }
-    //fetch single
-    //fetch all
-    //delete
-    //update
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<UserResponseDto> fetchUser(@PathVariable("userId") int id) throws ResourceNotFoundException {
+        UserResponseDto userResponseDto = userService.fetchSingleUser(id);
+        return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDto>> fetchAllUsers() {
+        List<UserResponseDto> userResponseDtoList = userService.fetchAllUsers();
+        return new ResponseEntity<>(userResponseDtoList, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable("userId")int id) throws ResourceNotFoundException {
+         userService.deleteUser(id);
+         return new ResponseEntity<>("User with id: " + id + " deleted successfully!", HttpStatus.OK);
+    }
+
+    @PutMapping("user/{userId}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable("userId")int id, @RequestBody UserRequestDto userRequestDto) throws ResourceNotFoundException {
+       UserResponseDto userResponseDto = userService.updateUser(userRequestDto, id);
+       return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
+    }
+
 }
