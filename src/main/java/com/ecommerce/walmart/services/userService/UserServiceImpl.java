@@ -37,10 +37,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto addUser(UserRequestDto userRequestDto) throws InvalidUserException {
-        User user = userRepo.findByEmailAddress(userRequestDto.getEmailAddress());
-        if (user!= null) {
-            throw new InvalidUserException("User already exists in database!");
+        if (!userRequestDto.getEmailAddress().isEmpty()) {
+            User user = userRepo.findByEmailAddress(userRequestDto.getEmailAddress());
+            if (user != null) {
+                throw new InvalidUserException("Email address already exists in database!");
+            }
         }
+
+       if (!userRequestDto.getMobileNumber().isEmpty()) {
+           User user = userRepo.findByMobileNumber(userRequestDto.getMobileNumber());
+           if (user != null) {
+               throw new InvalidUserException("Mobile number already exists in database!");
+           }
+       }
+
         User newUser = mapper.map(userRequestDto, User.class);
         newUser.setRegisteredDate(Date.from(Instant.now()));
         User savedUser = userRepo.save(newUser);
@@ -61,7 +71,7 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(userRequestDto.getFirstName());
         user.setLastName(userRequestDto.getLastName());
         user.setEmailAddress(userRequestDto.getEmailAddress());
-        user.setMobileNumber(user.getMobileNumber());
+        user.setMobileNumber(userRequestDto.getMobileNumber());
         User savedUser = userRepo.save(user);
         return mapper.map(savedUser, UserResponseDto.class);
     }
