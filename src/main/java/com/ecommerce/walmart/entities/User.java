@@ -47,7 +47,7 @@ public class User {
 
     @Column(nullable = false)
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "Asia/Kolkata")
     private Date registeredDate;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
                     Category category = mapper.map(categoryDto, Category.class);
                     return category;
                 } catch (ResourceNotFoundException e) {
-                    throw new RuntimeException(e.getMessage(), e);
+                    throw new RuntimeException("Category with id: " + id + " not found!");
                 }
             }).collect(Collectors.toList());
             product.setCategories(categories);

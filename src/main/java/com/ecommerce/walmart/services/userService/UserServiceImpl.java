@@ -1,6 +1,7 @@
 package com.ecommerce.walmart.services.userService;
 
 import com.ecommerce.walmart.entities.User;
+import com.ecommerce.walmart.exceptions.InvalidUserException;
 import com.ecommerce.walmart.exceptions.ResourceNotFoundException;
 import com.ecommerce.walmart.repositories.UserRepository;
 import com.ecommerce.walmart.services.dtos.AddressResponseDto;
@@ -10,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,9 +36,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto addUser(UserRequestDto userRequestDto) {
-        User user = mapper.map(userRequestDto, User.class);
-        User savedUser = userRepo.save(user);
+    public UserResponseDto addUser(UserRequestDto userRequestDto) throws InvalidUserException {
+        User user = userRepo.findByEmailAddress(userRequestDto.getEmailAddress());
+        if (user!= null) {
+            throw new InvalidUserException("User already exists in database!");
+        }
+        User newUser = mapper.map(userRequestDto, User.class);
+        newUser.setRegisteredDate(Date.from(Instant.now()));
+        User savedUser = userRepo.save(newUser);
         return mapper.map(savedUser, UserResponseDto.class);
     }
 
